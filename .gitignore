@@ -4,3 +4,4 @@
 ## Terraform artefacts
 .terraform/
 *.tfstate*
+ssh/
