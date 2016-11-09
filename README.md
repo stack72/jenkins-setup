@@ -35,6 +35,7 @@ To build the environment:
 
 ```
 cd ../terraform
+make ssh-key
 make plan
 ```
 
