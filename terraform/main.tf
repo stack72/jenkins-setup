@@ -46,3 +46,7 @@ data "aws_ami" "jenkins_ami" {
 output "jenkins_address" {
   value = "${module.jenkins_server.elb_address}"
 }
+
+output "jenkins_ssh_instructions" {
+  value = "${format("ssh -i ssh/%s ubuntu@%s", aws_key_pair.jenkins.key_name, module.jenkins_server.jenkins_ip)}"
+}

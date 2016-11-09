@@ -31,8 +31,8 @@ resource "aws_security_group" "jenkins_master_elb" {
   vpc_id      = "${var.vpc_id}"
 
   ingress {
-    from_port = 8080
-    to_port = 8080
+    from_port = 80
+    to_port = 80
     protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -49,7 +49,7 @@ resource "aws_instance" "jenkins" {
   ami = "${var.ami_id}"
   instance_type = "${var.instance_type}"
   key_name = "${var.key_name}"
-  security_groups = ["${aws_security_group.jenkins_master.id}"]
+  vpc_security_group_ids = ["${aws_security_group.jenkins_master.id}"]
   monitoring = false
   subnet_id = "${var.public_subnet_ids[0]}"
 
@@ -70,7 +70,7 @@ resource "aws_elb" "jenkins_master_elb" {
   listener {
     instance_port = 8080
     instance_protocol = "tcp"
-    lb_port = 8080
+    lb_port = 80
     lb_protocol = "tcp"
   }
 
