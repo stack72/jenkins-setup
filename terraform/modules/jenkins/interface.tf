@@ -2,10 +2,6 @@ variable "vpc_id" {
   type = "string"
 }
 
-variable "private_subnet_ids" {
-  type = "list"
-}
-
 variable "public_subnet_ids" {
   type = "list"
 }
@@ -49,4 +45,8 @@ variable "desired_capacity" {
 
 output "elb_address" {
   value = "${aws_elb.jenkins_master_elb.dns_name}"
+}
+
+output "jenkins_ip" {
+  value = "${aws_instance.jenkins.public_ip}"
 }

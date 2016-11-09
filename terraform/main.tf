@@ -18,3 +18,31 @@ module "jenkins_vpc" {
 
   availability_zones = ["${data.aws_availability_zones.zones.names}"]
 }
+
+module "jenkins_server" {
+  source = "./modules/jenkins"
+
+  vpc_id = "${module.jenkins_vpc.vpc_id}"
+  public_subnet_ids = ["${module.jenkins_vpc.public_subnets}"]
+  availability_zones = ["${module.jenkins_vpc.public_availability_zones}"]
+
+  ami_id   = "${data.aws_ami.jenkins_ami.id}"
+  key_name = "${aws_key_pair.jenkins.key_name}"
+}
+
+resource "aws_key_pair" "jenkins" {
+  key_name = "jenkins"
+  public_key = "${file("ssh/jenkins.pub")}"
+}
+
+data "aws_ami" "jenkins_ami" {
+  most_recent = true
+  filter {
+    name = "name"
+    values = ["ubuntu-jenkins-master*"]
+  }
+}
+
+output "jenkins_address" {
+  value = "${module.jenkins_server.elb_address}"
+}

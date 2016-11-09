@@ -45,19 +45,16 @@ resource "aws_security_group" "jenkins_master_elb" {
   }
 }
 
-resource "aws_launch_configuration" "jenkins_master_launch_config" {
-  image_id = "${var.ami_id}"
+resource "aws_instance" "jenkins" {
+  ami = "${var.ami_id}"
   instance_type = "${var.instance_type}"
   key_name = "${var.key_name}"
   security_groups = ["${aws_security_group.jenkins_master.id}"]
-  enable_monitoring = false
+  monitoring = false
+  subnet_id = "${var.public_subnet_ids[0]}"
 
   root_block_device {
     volume_size = "${var.volume_size}"
-  }
-
-  lifecycle {
-    create_before_destroy = true
   }
 }
 
@@ -67,6 +64,7 @@ resource "aws_elb" "jenkins_master_elb" {
   security_groups = ["${aws_security_group.jenkins_master_elb.id}"]
   cross_zone_load_balancing = true
   connection_draining = true
+  instances = ["${aws_instance.jenkins.id}"]
   internal = false
 
   listener {
@@ -83,16 +81,4 @@ resource "aws_elb" "jenkins_master_elb" {
     target = "TCP:8080"
     timeout = 5
   }
-}
-
-resource "aws_autoscaling_group" "jenkins_master_autoscale_group" {
-  name = "jenkins-master-autoscale-group"
-  availability_zones = ["${var.availability_zones}"]
-  vpc_zone_identifier = ["${var.private_subnet_ids}"]
-  launch_configuration = "${aws_launch_configuration.jenkins_master_launch_config.id}"
-  min_size = "${var.min_size}"
-  max_size = "${var.max_size}"
-  desired_capacity = "${var.desired_capacity}"
-  health_check_type = "EC2"
-  load_balancers = ["${aws_elb.jenkins_master_elb.name}"]
 }
