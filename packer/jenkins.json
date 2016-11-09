@@ -1,0 +1,27 @@
+{
+  "variables": {
+     "source_ami": "",
+     "region": ""
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "region": "{{user `region`}}",
+      "source_ami": "{{user `source_ami`}}",
+      "instance_type": "t2.micro",
+      "ssh_username": "ubuntu",
+      "ssh_timeout": "5m",
+      "ssh_pty": true,
+      "ami_name": "ubuntu-jenkins-master-{{timestamp}}"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": [
+          "setup.sh"
+      ]
+    }
+  ]
+}
+
